@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>➕ Adicionar Modelo</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Marca *</label>
+            <select name="marca" required>
+                <option value="">Selecione...</option>
+                {% for m in marcas %}
+                <option value="{{m.id}}">{{m.nome}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Nome do Modelo *</label>
+            <input type="text" name="nome" required placeholder="Ex: VF2, DMU 50">
+        </div>
+        <div style="display:flex;gap:10px;margin-top:30px">
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            <a href="{% url 'modelos_list' %}" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

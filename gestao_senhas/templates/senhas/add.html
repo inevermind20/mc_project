@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Gerar Senha SHA-256{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Gerador de Senhas SHA-256</h2>
+
+    <!-- Explicação -->
+    <div style="background: rgba(0,86,162,0.08); padding: 20px; border-radius: 12px; margin-bottom: 30px;">
+        <h3 style="margin: 0 0 15px; color: #0056a2;">Como Funciona</h3>
+        <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li><strong>Dados</strong>: NIF + Marca + Modelo + Série</li>
+            <li><strong>Hash SHA-256</strong>: Código criptográfico único</li>
+            <li><strong>Tipo</strong>: Alfanumérico ou Numérico conforme controlador</li>
+            <li><strong>Unicidade</strong>: Validação automática</li>
+        </ol>
+    </div>
+
+    <form method="post" id="form-senha">
+        {% csrf_token %}
+
+        <!-- Equipamento -->
+        <div class="form-group">
+            <label>Equipamento</label>
+            <select name="equipamento" id="equipamento_senha" required onchange="previewSenha(); verificarSenhaAtiva();">
+                <option value="">Selecione...</option>
+                {% for eq in equipamentos %}
+                    <option
+                        value="{{ eq.id }}"
+                        data-nif="{{ eq.cliente.nif }}"
+                        data-marca="{{ eq.modelo_controlador.modelo.marca.nome }}"
+                        data-modelo="{{ eq.modelo_controlador.modelo.nome }}"
+                        data-serie="{{ eq.numero_serie }}"
+                        data-tipo="{{ eq.modelo_controlador.versao_controlador.tipo_controlador.tipo_senha }}"
+                    >
+                        {{ eq.cliente.designacao_social }} - {{ eq.modelo_controlador }} - {{ eq.numero_serie }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Aviso de senha ativa -->
+        <div id="aviso-senha-ativa" class="alert alert-warning" style="display:none; margin-top:10px;"></div>
+
+        <!-- Comprimento -->
+        <div class="form-group">
+            <label>Comprimento: <strong id="val_comprimento">12</strong> caracteres</label>
+            <input
+                type="range"
+                name="comprimento"
+                id="comprimento_senha"
+                min="6"
+                max="16"
+                value="12"
+                oninput="document.getElementById('val_comprimento').textContent = this.value; previewSenha();"
+                style="width: 100%;"
+            >
+        </div>
+
+        <!-- Tipo e Datas -->
+        <div class="form-group">
+            <label>Tipo</label>
+            <select name="tipo" id="id_tipo">
+                <option value="temporaria">Temporária</option>
+                <option value="definitiva">Permanente</option>
+            </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label>Data Início</label>
+                <input type="date" name="data_inicio" required>
+            </div>
+            <div class="form-group" id="data-fim-wrapper">
+                <label>Data Fim</label>
+                <input type="date" name="data_fim" id="id_data_fim">
+            </div>
+        </div>
+
+        <!-- Preview -->
+        <div id="preview_container" style="display:none; margin: 30px 0;">
+            <div style="background: linear-gradient(135deg, #0056a2, #003d75); padding: 30px; border-radius: 12px;">
+                <h3 style="color: #fff; text-align: center; margin: 0 0 20px;">Preview</h3>
+
+                <div style="background: rgba(255,255,255,0.12); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <small style="color: rgba(255,255,255,0.9);">Dados Base</small>
+                    <code id="dados_base" style="color: #fff; display: block; margin-top: 8px; word-break: break-all;"></code>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.12); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <small style="color: rgba(255,255,255,0.9);">Hash SHA-256</small>
+                    <code id="hash_sha256" style="color: #32CD32; font-size: 0.7rem; display: block; margin-top: 8px; word-break: break-all;"></code>
+                </div>
+
+                <div style="text-align: center;">
+                    <small style="color: rgba(255,255,255,0.9);">Senha Final</small>
+                    <div id="senha_preview" style="font-size: 2.5rem; color: #fff; font-family: monospace; letter-spacing: 5px; margin: 10px 0;"></div>
+                </div>
+
+                <div id="tipo_badge" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn btn-primary">Gerar Senha</button>
+            <a href="{% url 'senhas_list' %}" class="btn" style="background: #ccc; color: #333;">Voltar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function previewSenha() {
+    const select = document.getElementById('equipamento_senha');
+    const comprimento = document.getElementById('comprimento_senha').value;
+    const container = document.getElementById('preview_container');
+
+    if (!select.value) {
+        container.style.display = 'none';
+        return;
+    }
+
+    fetch("{% url 'ajax_preview_senha' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            equipamento_id: select.value,
+            comprimento: comprimento
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            container.style.display = 'block';
+            document.getElementById('dados_base').textContent = data.dados;
+            document.getElementById('hash_sha256').textContent = data.hash;
+            document.getElementById('senha_preview').textContent = data.senha;
+
+            const badge = document.getElementById('tipo_badge');
+            if (data.tipo_senha === 'numerica') {
+                badge.innerHTML = '<span style="background:#EA5D0A;color:#fff;padding:8px 20px;border-radius:20px;font-weight:600;">NUMÉRICA</span>';
+            } else {
+                badge.innerHTML = '<span style="background:#10b981;color:#fff;padding:8px 20px;border-radius:20px;font-weight:600;">ALFANUMÉRICA</span>';
+            }
+
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+            console.error('Erro preview senha:', data.error);
+        }
+    })
+    .catch(err => {
+        console.error('Erro preview:', err);
+    });
+}
+
+function toggleDataFim() {
+    const tipo = document.getElementById('id_tipo').value;
+    const wrapper = document.getElementById('data-fim-wrapper');
+    const dataInput = document.getElementById('id_data_fim');
+
+    if (tipo === 'definitiva') {
+        wrapper.style.display = 'none';
+        if (dataInput) {
+            dataInput.value = '';
+        }
+    } else {
+        wrapper.style.display = '';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const tipoSelect = document.getElementById('id_tipo');
+    if (tipoSelect) {
+        tipoSelect.addEventListener('change', toggleDataFim);
+        toggleDataFim();
+    }
+});
+
+function verificarSenhaAtiva() {
+    const select = document.getElementById('equipamento_senha');
+    const aviso = document.getElementById('aviso-senha-ativa');
+    const equipamentoId = select.value;
+
+    aviso.style.display = 'none';
+    aviso.innerHTML = '';
+
+    if (!equipamentoId) {
+        return;
+    }
+
+    fetch("{% url 'ajax_verificar_senha_ativa' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ equipamento_id: equipamentoId })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.success) {
+            return;
+        }
+
+        if (!data.tem_ativa) {
+            return;
+        }
+
+        let texto = '';
+
+        if (data.tipo === 'permanente') {
+            texto += `Este equipamento já tem uma senha <strong>permanente</strong> ativa: <strong>${data.senha}</strong> (desde ${data.data_inicio}).`;
+        } else {
+            texto += `Este equipamento já tem uma senha <strong>temporária</strong> ativa: <strong>${data.senha}</strong> (de ${data.data_inicio} até ${data.data_fim}).`;
+        }
+
+        texto += '<br>Abra a listagem de senhas para desativar, substituir ou consultar o histórico.';
+        texto += ' <a href="{% url 'senhas_list' %}" class="btn btn-sm btn-primary" style="margin-left:5px;">Ver senhas</a>';
+
+        aviso.innerHTML = texto;
+        aviso.style.display = 'block';
+    })
+    .catch(err => {
+        console.error('Erro ao verificar senha ativa', err);
+    });
+}
+</script>
+{% endblock %}

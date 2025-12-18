@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>➕ Adicionar Utilizador</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Username *</label>
+            <input type="text" name="username" required>
+        </div>
+        <div class="form-group">
+            <label>Email *</label>
+            <input type="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label>Password *</label>
+            <input type="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label>Primeiro Nome</label>
+            <input type="text" name="first_name">
+        </div>
+        <div class="form-group">
+            <label>Último Nome</label>
+            <input type="text" name="last_name">
+        </div>
+
+        <!-- LÓGICA CORRIGIDA: Tecnimpor vs Cliente -->
+        <div class="form-group">
+            <label>Tipo de Utilizador *</label>
+            <select name="tipo_empresa" id="tipo_empresa" onchange="atualizarPerfis()" required>
+                <option value="">Selecione...</option>
+                <option value="tecnimpor">Tecnimpor (Interno)</option>
+                <option value="cliente">Cliente</option>
+            </select>
+        </div>
+
+        <!-- PERFIS (muda conforme tipo) -->
+        <div class="form-group" id="perfil_group" style="display:none">
+            <label>Perfil *</label>
+            <select name="perfil" id="perfil" required>
+                <!-- Preenchido via JavaScript -->
+            </select>
+        </div>
+
+        <!-- EMPRESA CLIENTE (só se tipo=cliente) -->
+        <div class="form-group" id="empresa_cliente_group" style="display:none">
+            <label>Empresa Cliente *</label>
+            <select name="empresa_cliente" id="empresa_cliente">
+                <option value="">Selecione...</option>
+                {% for c in clientes %}
+                <option value="{{c.id}}">{{c.nif}} - {{c.designacao_social}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:30px">
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            <a href="{% url 'utilizadores_list' %}" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function atualizarPerfis() {
+    const tipo = document.getElementById('tipo_empresa').value;
+    const perfilGroup = document.getElementById('perfil_group');
+    const perfilSelect = document.getElementById('perfil');
+    const empresaGroup = document.getElementById('empresa_cliente_group');
+    const empresaSelect = document.getElementById('empresa_cliente');
+
+    if (!tipo) {
+        perfilGroup.style.display = 'none';
+        empresaGroup.style.display = 'none';
+        return;
+    }
+
+    perfilGroup.style.display = 'block';
+    perfilSelect.innerHTML = '';
+
+    if (tipo === 'tecnimpor') {
+        // Tecnimpor: User, Admin, SuperAdmin (só SuperAdmin vê SuperAdmin)
+        perfilSelect.innerHTML = '<option value="user">User</option><option value="admin">Admin</option>';
+        {% if user.perfil == 'superadmin' %}
+        perfilSelect.innerHTML += '<option value="superadmin">SuperAdmin</option>';
+        {% endif %}
+        empresaGroup.style.display = 'none';
+        empresaSelect.required = false;
+    } else {
+        // Cliente: Sempre Viewer
+        perfilSelect.innerHTML = '<option value="viewer">Viewer</option>';
+        empresaGroup.style.display = 'block';
+        empresaSelect.required = true;
+    }
+}
+</script>
+{% endblock %}

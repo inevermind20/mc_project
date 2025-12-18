@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./crm_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./crm_backend:/app
+    depends_on:
+      - db
+
+  frontend:
+    build: ./crm_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./crm_frontend:/app
+    command: npm start
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: crm_db
+    ports:
+      - "5432:5432"

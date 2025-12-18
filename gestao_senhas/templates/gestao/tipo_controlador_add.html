@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar Tipo de Controlador{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Adicionar Tipo de Controlador</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="nome">Nome do Tipo de Controlador *</label>
+            <input type="text" 
+                   id="nome" 
+                   name="nome" 
+                   class="form-control" 
+                   placeholder="Ex: FANUC 31i, SIEMENS 840D" 
+                   required>
+        </div>
+
+        <!-- ✅ NOVO CAMPO -->
+        <div class="form-group">
+            <label for="tipo_senha">Tipo de Senha Permitida *</label>
+            <select id="tipo_senha" name="tipo_senha" class="form-control" required>
+                <option value="alfanumerica">🔤 Alfanumérica (Letras + Números)</option>
+                <option value="numerica">🔢 Numérica (Apenas Números)</option>
+            </select>
+            <small class="form-text text-muted">
+                Define se este controlador aceita senhas alfanuméricas (A-F + 0-9) ou apenas numéricas (0-9)
+            </small>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn btn-primary">💾 Salvar</button>
+            <a href="{% url 'tipo_controlador_list' %}" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

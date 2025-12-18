@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><h2>🔐 Gerar Senha Automática</h2>
+<div class="alert alert-success">O sistema gera automaticamente uma senha SHA-256 única baseada em NIF + Marca + Modelo + Nº Série</div>
+<form method="post">{% csrf_token %}
+<div class="form-group"><label>Equipamento *</label><select name="equipamento" required><option value="">Selecione...</option>{% for e in equipamentos %}<option value="{{e.id}}">{{e.cliente.nif}} | {{e.modelo_controlador}} | SN:{{e.numero_serie}}</option>{% endfor %}</select></div>
+<div class="form-group"><label>Tipo *</label><select name="tipo" id="tipo" onchange="document.getElementById('temp').style.display=this.value=='temporaria'?'block':'none'"><option value="definitiva">Definitiva</option><option value="temporaria">Temporária</option></select></div>
+<div class="form-group"><label>Data Início *</label><input type="date" name="data_inicio" required></div>
+<div id="temp" style="display:none">
+<div class="form-group"><label>Data Fim</label><input type="date" name="data_fim"></div>
+<div class="form-group"><label>Ou número de dias</label><input type="number" name="numero_dias" min="1"></div>
+</div>
+<button type="submit" class="btn btn-primary">🔐 Gerar Senha</button>
+<a href="{% url 'senhas_list' %}" class="btn" style="background:#ccc">← Voltar</a>
+</form></div>
+{% endblock %}

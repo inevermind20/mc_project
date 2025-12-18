@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2>👤 Utilizadores</h2>
+        <div style="display:flex;gap:10px">
+            {% if user.perfil in 'admin,superadmin' %}
+            <a href="{% url 'utilizador_add' %}" class="btn btn-secondary">➕ Adicionar</a>
+            {% endif %}
+            <a href="/" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" placeholder="🔍 Pesquisar..." onkeyup="pesquisar(this)">
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Perfil</th>
+                    <th>Tipo</th>
+                    {% if user.perfil == 'superadmin' %}<th>Ações</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in utilizadores %}
+                <tr>
+                    <td><strong>{{u.username}}</strong></td>
+                    <td>{{u.first_name}} {{u.last_name}}</td>
+                    <td>{{u.email}}</td>
+                    <td>
+                        {% if u.perfil == 'superadmin' %}
+                            <span style="background:#10b981;color:#fff;padding:4px 12px;border-radius:6px;font-size:0.85rem">SuperAdmin</span>
+                        {% elif u.perfil == 'admin' %}
+                            <span style="background:#0056a2;color:#fff;padding:4px 12px;border-radius:6px;font-size:0.85rem">Admin</span>
+                        {% elif u.perfil == 'user' %}
+                            <span style="background:#EA5D0A;color:#fff;padding:4px 12px;border-radius:6px;font-size:0.85rem">User</span>
+                        {% else %}
+                            <span style="background:#999;color:#fff;padding:4px 12px;border-radius:6px;font-size:0.85rem">Viewer</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.tipo_utilizador == 'tecnimpor' %}
+                            <span style="background:rgba(0,86,162,0.15);color:#0056a2;padding:4px 12px;border-radius:6px;font-size:0.85rem">Tecnimpor</span>
+                        {% else %}
+                            <span style="background:rgba(234,93,10,0.15);color:#EA5D0A;padding:4px 12px;border-radius:6px;font-size:0.85rem">Cliente</span>
+                        {% endif %}
+                    </td>
+                    {% if user.perfil == 'superadmin' %}
+                    <td>
+                        {% if u.id != user.id %}
+                        <button onclick="confirmDelete('{% url 'utilizador_delete' u.id %}','{{u.username}}')" 
+                                class="btn btn-danger">🗑️</button>
+                        {% else %}
+                        <span style="color:#999;font-size:0.85rem">Você</span>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:40px;color:#999">
+                        Nenhum utilizador encontrado
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function pesquisar(input) {
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

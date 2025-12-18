@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- CONTADORES -->
+<div class="card">
+    <h2>📊 Contadores</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>{{total_clientes}}</h3>
+            <p>Clientes</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{total_equipamentos}}</h3>
+            <p>Equipamentos</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{total_senhas}}</h3>
+            <p>Senhas Ativas</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{total_usuarios}}</h3>
+            <p>Utilizadores</p>
+        </div>
+    </div>
+</div>
+
+<!-- AÇÕES RÁPIDAS -->
+{% if user.perfil != 'viewer' %}
+<div class="card">
+    <h2>⚡ Ações Rápidas</h2>
+    <div class="acoes-rapidas">
+        <div class="acao-card" onclick="window.location.href='{% url 'cliente_add' %}'">
+            <span style="font-size:3rem">👥</span>
+            <h3>Adicionar Cliente</h3>
+        </div>
+        {% if user.perfil in 'admin,superadmin' %}
+        <div class="acao-card" onclick="window.location.href='{% url 'utilizador_add' %}'">
+            <span style="font-size:3rem">👤</span>
+            <h3>Adicionar Utilizador</h3>
+        </div>
+        {% endif %}
+        <div class="acao-card" onclick="window.location.href='{% url 'equipamento_add' %}'">
+            <span style="font-size:3rem">🖥️</span>
+            <h3>Adicionar Equipamento</h3>
+        </div>
+        <div class="acao-card" onclick="window.location.href='{% url 'senha_add' %}'">
+            <span style="font-size:3rem">🔐</span>
+            <h3>Gerar Senha</h3>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- GESTÃO COMPLETA -->
+<div class="card">
+    <h2>⚙️ Gestão Completa</h2>
+    <div class="gestao-grid">
+        <!-- Clientes -->
+        {% if user.perfil != 'viewer' %}
+        <div class="gestao-item">
+            <h4>👥 Clientes</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'clientes_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                <a href="{% url 'cliente_add' %}" class="btn-small btn-secondary">➕ Adicionar</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Utilizadores -->
+        {% if user.perfil in 'admin,superadmin' %}
+        <div class="gestao-item">
+            <h4>👤 Utilizadores</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'utilizadores_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                <a href="{% url 'utilizador_add' %}" class="btn-small btn-secondary">➕ Adicionar</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Marcas -->
+        {% if user.perfil in 'user,admin,superadmin' %}
+        <div class="gestao-item">
+            <h4>🏷️ Marcas</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'marcas_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                <a href="{% url 'marca_add' %}" class="btn-small btn-secondary">➕ Adicionar</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Tipo Controlador -->
+        {% if user.perfil in 'user,admin,superadmin' %}
+        <div class="gestao-item">
+            <h4>🎛️ Tipo Controlador</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'tipo_controlador_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                <a href="{% url 'tipo_controlador_add' %}" class="btn-small btn-secondary">➕ Adicionar</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Versão Controlador -->
+        {% if user.perfil in 'user,admin,superadmin' %}
+        <div class="gestao-item">
+            <h4>🔢 Versão Controlador</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'versao_controlador_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                <a href="{% url 'versao_controlador_add' %}" class="btn-small btn-secondary">➕ Adicionar</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Modelos -->
+        {% if user.perfil in 'user,admin,superadmin' %}
+        <div class="gestao-item">
+            <h4>📦 Modelos</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'modelos_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                <a href="{% url 'modelo_add' %}" class="btn-small btn-secondary">➕ Adicionar</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Modelo + Controlador -->
+        {% if user.perfil in 'user,admin,superadmin' %}
+        <div class="gestao-item">
+            <h4>🔗 Modelo + Controlador</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'modelo_controlador_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                <a href="{% url 'modelo_controlador_add' %}" class="btn-small btn-secondary">➕ Adicionar</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Equipamentos -->
+        <div class="gestao-item">
+            <h4>🖥️ Equipamentos</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'equipamentos_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                {% if user.perfil != 'viewer' %}
+                <a href="{% url 'equipamento_add' %}" class="btn-small btn-secondary">➕ Adicionar</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Gerador de Senhas -->
+        <div class="gestao-item">
+            <h4>🔐 Gerador de Senhas</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'senhas_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                {% if user.perfil != 'viewer' %}
+                <a href="{% url 'senha_add' %}" class="btn-small btn-secondary">➕ Gerar</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Histórico Senhas -->
+        {% if user.perfil == 'superadmin' %}
+        <div class="gestao-item">
+            <h4>📜 Histórico Senhas</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'historico_senhas_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Países -->
+        {% if user.perfil in 'admin,superadmin' %}
+        <div class="gestao-item">
+            <h4>🌍 Países</h4>
+            <div class="gestao-buttons">
+                <a href="{% url 'paises_list' %}" class="btn-small btn-primary">📋 Ver Lista</a>
+                <a href="{% url 'pais_add' %}" class="btn-small btn-secondary">➕ Adicionar</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

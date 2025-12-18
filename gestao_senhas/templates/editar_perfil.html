@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>✏️ Editar Perfil</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group"><label>Primeiro Nome</label><input type="text" name="first_name" value="{{user.first_name}}"></div>
+        <div class="form-group"><label>Último Nome</label><input type="text" name="last_name" value="{{user.last_name}}"></div>
+        <div class="form-group">
+            <label>Email {% if user.perfil not in 'admin,superadmin' %}(não editável){% endif %}</label>
+            <input type="email" name="email" value="{{user.email}}" {% if user.perfil not in 'admin,superadmin' %}readonly{% endif %}>
+        </div>
+        <div class="form-group"><label>Username (não editável)</label><input type="text" value="{{user.username}}" readonly></div>
+        <div class="form-group"><label>Nova Password (opcional)</label><input type="password" name="new_password"></div>
+        <div style="display:flex;gap:10px">
+            <button type="submit" class="btn btn-primary">💾 Salvar</button>
+            <a href="/" class="btn" style="background:#ccc">← Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

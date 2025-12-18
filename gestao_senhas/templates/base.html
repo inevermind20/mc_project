@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TECNIMPOR CNC{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- HEADER (SÓ LOGO + USER) -->
+    <header class="header-fixed">
+        <div class="header-container">
+            <div class="logo" onclick="window.location.href='/'">
+                <img src="/static/images/Tecnimpor_logo-trim.png" alt="TECNIMPOR">
+            </div>
+            <div class="user-info">
+                <span class="user-name">👤 {% if user.first_name %}{{user.first_name}} {{user.last_name}}{% else %}{{user.email|default:user.username}}{% endif %}</span>
+                {% if user.perfil == 'superadmin' %}
+                <a href="/django-admin/" target="_blank" class="btn-admin">⚙️ Admin</a>
+                {% endif %}
+                <a href="{% url 'editar_perfil' %}" class="btn-perfil">✏️ Perfil</a>
+                <a href="{% url 'logout' %}" class="btn-logout">Sair</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO -->
+    <main class="main-content">
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- MENU NO RODAPÉ (FOOTER FIXO) -->
+    <footer class="footer-menu">
+        <div class="footer-container">
+            <button class="menu-toggle" onclick="toggleFooterMenu()">☰ Menu</button>
+            <div class="menu-items" id="footerMenuItems">
+                <a href="/" class="{% if request.path == '/' %}active{% endif %}">🏠 Início</a>
+                <a href="{% url 'clientes_list' %}" class="{% if '/clientes' in request.path %}active{% endif %}">👥 Clientes</a>
+                <a href="{% url 'utilizadores_list' %}" class="{% if '/utilizadores' in request.path %}active{% endif %}">👤 Utilizadores</a>
+                <a href="{% url 'equipamentos_list' %}" class="{% if '/equipamentos' in request.path %}active{% endif %}">🖥️ Equipamentos</a>
+                <a href="{% url 'senhas_list' %}" class="{% if '/senhas' in request.path %}active{% endif %}">🔐 Senhas</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Toggle menu mobile no rodapé
+    function toggleFooterMenu() {
+        const menu = document.getElementById('footerMenuItems');
+        menu.classList.toggle('active');
+    }
+
+    // Fechar menu ao clicar em link (mobile)
+    document.querySelectorAll('.menu-items a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                document.getElementById('footerMenuItems').classList.remove('active');
+            }
+        });
+    });
+    </script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

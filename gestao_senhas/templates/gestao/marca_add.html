@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>➕ Adicionar Marca</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Nome da Marca *</label>
+            <input type="text" name="nome" required placeholder="Ex: HAAS, DMG MORI">
+        </div>
+        <div style="display:flex;gap:10px;margin-top:30px">
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            <a href="{% url 'marcas_list' %}" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

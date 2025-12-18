@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>➕ Adicionar País</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Código (ISO) *</label>
+            <input type="text" name="codigo" required maxlength="3" placeholder="Ex: PT, ES, FR">
+        </div>
+        <div class="form-group">
+            <label>Designação *</label>
+            <input type="text" name="designacao" required placeholder="Ex: PORTUGAL">
+        </div>
+        <div style="display:flex;gap:10px;margin-top:30px">
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            <a href="{% url 'paises_list' %}" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2>👥 Clientes</h2>
+        <div style="display:flex;gap:10px">
+            {% if user.perfil != 'viewer' %}
+            <a href="{% url 'cliente_add' %}" class="btn btn-secondary">➕ Adicionar</a>
+            {% endif %}
+            <a href="/" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" placeholder="🔍 Pesquisar..." onkeyup="pesquisar(this)">
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>NIF</th>
+                    <th>Nome</th>
+                    <th>País</th>
+                    <th>Email</th>
+                    {% if user.perfil == 'superadmin' %}<th>Ações</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in clientes %}
+                <tr>
+                    <td>{{c.nif}}</td>
+                    <td>{{c.designacao_social}}</td>
+                    <td>{{c.pais.codigo}}</td>
+                    <td>{{c.email|default:"-"}}</td>
+                    {% if user.perfil == 'superadmin' %}
+                    <td>
+                        <button onclick="confirmDelete('{% url 'cliente_delete' c.id %}','{{c.designacao_social}}')" 
+                                class="btn btn-danger">🗑️</button>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center;padding:40px;color:#999">
+                        Nenhum cliente encontrado
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function pesquisar(input) {
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

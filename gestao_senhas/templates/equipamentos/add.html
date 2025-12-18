@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>➕ Adicionar Equipamento</h2>
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Cliente -->
+        <div class="form-group">
+            <label>Cliente *</label>
+            <select name="cliente" required>
+                <option value="">Selecione o cliente...</option>
+                {% for c in clientes %}
+                <option value="{{c.id}}">{{c.nif}} - {{c.designacao_social}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Modelo + Controlador (dropdown direto) -->
+        <div class="form-group">
+            <label>Modelo + Controlador *</label>
+            <select name="modelo_controlador" required>
+                <option value="">Selecione...</option>
+                {% for mc in modelos_controladores %}
+                <option value="{{mc.id}}">{{mc}}</option>
+                {% endfor %}
+            </select>
+            <small style="color:#666;font-size:0.85rem">
+                Se não encontrar a combinação, adicione em Gestão Completa → Modelo+Controlador
+            </small>
+        </div>
+
+        <!-- Número de Série -->
+        <div class="form-group">
+            <label>Número de Série *</label>
+            <input type="text" name="numero_serie" required placeholder="Ex: SN123456">
+        </div>
+
+        <!-- Notas -->
+        <div class="form-group">
+            <label>Notas</label>
+            <textarea name="notas" rows="4" placeholder="Notas adicionais (opcional)"></textarea>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:30px;flex-wrap:wrap">
+            <button type="submit" class="btn btn-primary">💾 Guardar Equipamento</button>
+            <a href="{% url 'equipamentos_list' %}" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

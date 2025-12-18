@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2>🏷️ Marcas</h2>
+        <div style="display:flex;gap:10px">
+            {% if user.perfil in 'user,admin,superadmin' %}
+            <a href="{% url 'marca_add' %}" class="btn btn-secondary">➕ Adicionar</a>
+            {% endif %}
+            <a href="/" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" placeholder="🔍 Pesquisar..." onkeyup="pesquisar(this)">
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    {% if user.perfil == 'superadmin' %}<th>Ações</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{item.nome}}</td>
+                    {% if user.perfil == 'superadmin' %}
+                    <td>
+                        <button onclick="confirmDelete('{% url 'marca_delete' item.id %}','{{item.nome}}')" 
+                                class="btn btn-danger">🗑️</button>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" style="text-align:center;padding:40px;color:#999">
+                        Nenhuma marca encontrada
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function pesquisar(input) {
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <h2>📜 Histórico de Senhas</h2>
+        <a href="/" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" placeholder="🔍 Pesquisar..." onkeyup="pesquisar(this)">
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Senha</th>
+                    <th>Equipamento</th>
+                    <th>Ação</th>
+                    <th>Utilizador</th>
+                    <th>Data</th>
+                    <th>Hora</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td><strong>{{item.senha.senha}}</strong></td>
+                    <td>{{item.senha.equipamento}}</td>
+                    <td>{{item.get_acao_display}}</td>
+                    <td>{{item.usuario.username}}</td>
+                    <td>{{item.data|date:"d-m-Y"}}</td>
+                    <td>{{item.hora|time:"H:i:s"}}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:40px;color:#999">
+                        Nenhum histórico encontrado
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function pesquisar(input) {
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

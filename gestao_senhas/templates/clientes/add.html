@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>➕ Adicionar Cliente</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>NIF *</label>
+            <input type="text" name="nif" required maxlength="9" pattern="[0-9]{9}" placeholder="9 dígitos">
+        </div>
+        <div class="form-group">
+            <label>Designação Social *</label>
+            <input type="text" name="designacao_social" required>
+        </div>
+        <div class="form-group">
+            <label>Designação Comercial</label>
+            <input type="text" name="designacao_comercial">
+        </div>
+        <div class="form-group">
+            <label>País *</label>
+            <select name="pais" required>
+                <option value="">Selecione...</option>
+                {% for p in paises %}
+                <option value="{{p.id}}" {% if p.codigo == 'PT' %}selected{% endif %}>{{p.codigo}} - {{p.designacao}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email">
+        </div>
+        <div class="form-group">
+            <label>Telefone</label>
+            <input type="tel" name="telefone">
+        </div>
+        <div class="form-group">
+            <label>Morada</label>
+            <textarea name="morada" rows="3"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:30px">
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            <a href="{% url 'clientes_list' %}" class="btn" style="background:#ccc;color:#333">← Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
